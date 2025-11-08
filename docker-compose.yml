@@ -1,0 +1,109 @@
+services:
+
+  kafka:
+    image: confluentinc/cp-kafka:8.1.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_RETENTION_HOURS: 24 # Datenschutz, Löschung Persistenter Daten nach 24h
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "bash", "-c", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 6
+    networks:
+      - data-pipeline
+
+  sensor-simulator:
+    build: ./sensor_data
+    image: sensor-simulator:latest
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./sensor_data:/app
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: unless-stopped
+    networks:
+      - data-pipeline
+
+  spark-master:
+    image: bde2020/spark-master:3.3.0-hadoop3.3
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./spark:/opt/spark-apps
+      - spark_data:/opt/spark-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - data-pipeline
+
+  spark-worker:
+    image: bde2020/spark-worker:3.3.0-hadoop3.3
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=2
+    networks:
+      - data-pipeline
+
+  spark-submit-job:
+    image: bde2020/spark-submit:3.3.0-hadoop3.3
+    depends_on:
+      kafka:
+        condition: service_healthy
+      spark-master:
+        condition: service_healthy
+    volumes:
+      - ./spark:/opt/spark-apps
+    command:
+      [
+        "/spark/bin/spark-submit",
+        "--master", "spark://spark-master:7077",
+        "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0",
+        "/opt/spark-apps/spark_kafka_consumer.py"
+      ]
+    restart: "no"
+    networks:
+      - data-pipeline
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8085:8080
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=disabled
+    networks:
+      - data-pipeline
+
+volumes:
+  kafka_data:
+  spark_data:
+
+networks:
+  data-pipeline:
+    driver: bridge
