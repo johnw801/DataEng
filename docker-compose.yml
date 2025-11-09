@@ -28,22 +28,26 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      spark-master:
+          condition: service_healthy
+      cassandra:
+          condition: service_healthy
     volumes:
       - ./sensor_data:/app
     environment:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    command: >
+      bash -c "sleep 60 && python /app/sensordata.py"
     restart: unless-stopped
     networks:
       - data-pipeline
 
   spark-master:
     image: bde2020/spark-master:3.3.0-hadoop3.3
-    ports:
-      - "8080:8080"
-      - "7077:7077"
     volumes:
       - ./spark:/opt/spark-apps
       - spark_data:/opt/spark-data
+      - spark_checkpoints:/tmp/spark-checkpoint
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 15s
@@ -54,15 +58,15 @@ services:
 
   spark-worker:
     image: bde2020/spark-worker:3.3.0-hadoop3.3
+    ports:
+      - "8081:8081" # Für Web-UI
     depends_on:
       spark-master:
         condition: service_healthy
-    ports:
-      - "8081:8081"
     environment:
       - SPARK_MASTER=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=2
+    volumes:
+      - spark_checkpoints:/tmp/spark-checkpoint
     networks:
       - data-pipeline
 
@@ -73,36 +77,46 @@ services:
         condition: service_healthy
       spark-master:
         condition: service_healthy
+      cassandra:
+        condition: service_healthy
     volumes:
       - ./spark:/opt/spark-apps
+      - spark_checkpoints:/tmp/spark-checkpoint
     command:
       [
         "/spark/bin/spark-submit",
         "--master", "spark://spark-master:7077",
-        "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0",
+        "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,com.datastax.spark:spark-cassandra-connector_2.12:3.3.0",
         "/opt/spark-apps/spark_kafka_consumer.py"
       ]
-    restart: "no"
+    env_file:
+      - .env
+    restart: on-failure
     networks:
       - data-pipeline
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    ports:
-      - 8085:8080
-    depends_on:
-      kafka:
-        condition: service_healthy
-    environment:
-      - KAFKA_CLUSTERS_0_NAME=local
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-      - KAFKA_CLUSTERS_0_ZOOKEEPER=disabled
-    networks:
-      - data-pipeline
+  cassandra:
+      container_name: cassandra
+      image: cassandra:4.1
+      ports:
+        - "9042:9042"   # Für Anbindung an PyCharm
+      volumes:
+        - ./cassandra/cassandra.yaml:/etc/cassandra/cassandra.yaml
+        - cassandra_data:/var/lib/cassandra
+        - ./cassandra/init.cql:/init.cql:ro
+      healthcheck:
+        test: ["CMD-SHELL", "cqlsh -u cassandra -p cassandra -e 'describe keyspaces' || exit 1"]
+        interval: 20s
+        timeout: 10s
+        retries: 10
+      networks:
+        - data-pipeline
 
 volumes:
   kafka_data:
   spark_data:
+  cassandra_data:
+  spark_checkpoints:
 
 networks:
   data-pipeline:
