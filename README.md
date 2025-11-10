@@ -5,7 +5,7 @@ Dieses Projekt demonstriert eine vollständige Streaming Data Pipeline mit Kafka
 ---
 ## Architekturüberblick
 
-### Datenfluss:
+### Datenfluss
 Sensor-Simulator → Kafka → Spark Structured Streaming → Cassandra
 
 Sensor-Simulator sendet fortlaufend JSON-Messwerte (Temperatur, Salzgehalt) von drei simulierten Sensoren an Kafka.
