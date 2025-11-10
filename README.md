@@ -59,7 +59,9 @@ Vor dem Start sollten folgende Tools installiert werden:
 
 - Der vollständige Start aller Services kann bis zu 5 Minuten dauern.
 - Der Sensor-Simulator hat einen Startverzögerungstimer von 2 Minuten, damit alle abhängigen Services (Kafka, Spark, Cassandra) korrekt initialisiert sind bevor Daten gesendet werden.
+Bei langsameren Hostsystemen kann dieser Wert bei Bedarf erhöht werden.
 - Innerhalb dieser 2 Minuten sollte bei Erstinitialisierung die u.g. Cassandra `init.cql` ausgeführt werden.
+- Healthchecks sorgen dafür, dass Services in der richtigen Reihenfolge initialisiert werden.
 
 ### 1️. Starten der Container
 
@@ -67,7 +69,7 @@ Vor dem Start sollten folgende Tools installiert werden:
 docker compose up --build -d
 ```
 
-Alle Container werden gebaut und gestartet. Healthchecks sorgen dafür, dass Services in der richtigen Reihenfolge initialisiert werden.
+Alle Container werden gebaut und gestartet.
 
 ---
 
