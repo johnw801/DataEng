@@ -41,6 +41,16 @@ project-root/
 └── .env                       # Muss manuell angelegt werden (Cassandra-Credentials)
 ```
 
+### Verwendete Docker Images
+- cassandra:4.1
+- confluentinc/cp-kafka:8.1.0
+- bde2020/spark-master:3.3.0-hadoop3.3
+- bde2020/spark-worker:3.3.0-hadoop3.3
+- bde2020/spark-submit:3.3.0-hadoop3.3
+- Optional: provectuslabs/kafka-ui:latest
+
+---
+
 ## Voraussetzungen
 
 Vor dem Start sollten folgende Tools installiert werden:
