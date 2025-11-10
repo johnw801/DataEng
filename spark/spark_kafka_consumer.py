@@ -1,3 +1,32 @@
+"""
+Kafka → Spark Structured Streaming → Cassandra Pipeline
+
+Funktion:
+Dieses Skript liest kontinuierlich Sensordaten aus einem Kafka-Topic ("sensor-data"),
+führt zeitfensterbasierte Aggregationen (Temperatur/Salzgehalt) durch,
+erkennt Temperatur-Anomalien und schreibt Ergebnisse in Cassandra-Tabellen.
+
+Komponenten:
+- Kafka  → Datenquelle (JSON-Messages)
+- Spark  → Stream-Verarbeitung & Aggregation
+- Cassandra → Persistente Speicherung
+
+Parameter:
+- Kafka Topic: sensor-data
+- Cassandra Keyspace: sensordata
+  Tabellen: sensor_aggregates, sensor_anomalies
+- ENV Variablen: CASSANDRA_USER, CASSANDRA_PASSWORD
+
+Abhängigkeiten:
+- pyspark
+- kafka-python (Kafka-Producer, wenn simuliert)
+- Cassandra Connector für Spark
+
+Hinweise:
+- Authentifizierungsdaten (Cassandra) werden über Umgebungsvariablen
+  `CASSANDRA_USER` und `CASSANDRA_PASSWORD` eingelesen.
+"""
+
 import os
 import logging
 from pyspark.sql import SparkSession
@@ -16,150 +45,165 @@ logger = logging.getLogger("spark-consumer")
 logger.info("Spark Streaming job starting...")
 
 # Environment konfiguration
-kafka_bootstrap_servers = "kafka:9092"
-kafka_topic = "sensor-data"
-cassandra_user = os.getenv("CASSANDRA_USER") #.env anlegen und User hinterlegen
-cassandra_pass = os.getenv("CASSANDRA_PASSWORD") #.env anlegen und PW hinterlegen
+KAFKA_BOOTSTRAP = "kafka:9092"
+KAFKA_TOPIC = "sensor-data"
+SPARK_PACKAGES = ("org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,"
+                  "com.datastax.spark:spark-cassandra-connector_2.12:3.3.0")
+CASSANDRA_HOST = "cassandra"
+CASSANDRA_PORT = "9042"
+CASSANDRA_USER = os.getenv("CASSANDRA_USER") #.env anlegen und User hinterlegen
+CASSANDRA_PASS = os.getenv("CASSANDRA_PASSWORD") #.env anlegen und PW hinterlegen
 
 # Spark Session setup
 spark = SparkSession.builder \
     .appName("KafkaSparkStreamingConsumer") \
-    .config("spark.jars.packages",
-            "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,"
-            "com.datastax.spark:spark-cassandra-connector_2.12:3.3.0") \
-    .config("spark.cassandra.connection.host", "cassandra") \
-    .config("spark.cassandra.connection.port", "9042") \
+    .config("spark.jars.packages",SPARK_PACKAGES) \
+    .config("spark.cassandra.connection.host", CASSANDRA_HOST) \
+    .config("spark.cassandra.connection.port", CASSANDRA_PORT) \
     .getOrCreate()
 
 spark.sparkContext.setLogLevel("WARN")
 
-# Kafka-Stream lesen #Fail von DataLoss evtl. an HIER PRÜFEN
-logger.info(f"Connecting to Kafka topic '{kafka_topic}' on {kafka_bootstrap_servers}...")
+# Kafka Stream einlesen
+logger.info(f"Connecting to Kafka topic '{KAFKA_TOPIC}' on {KAFKA_BOOTSTRAP}...")
 
-raw_df = spark \
-    .readStream \
-    .format("kafka") \
-    .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
-    .option("subscribe", kafka_topic) \
-    .option("startingOffsets", "latest") \
-    .option("failOnDataLoss", "false") \
+# Spark liest kontinuierlich neue Daten aus Kafka
+raw_df = (
+    spark.readStream
+    .format("kafka")
+    .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
+    .option("subscribe", KAFKA_TOPIC)
+    .option("startingOffsets", "earliest") #"earliest" = alle vorhandenen Daten + neue
+    .option("failOnDataLoss", "true")  # bricht ab, falls Datenlücke erkannt wird
     .load()
+)
 
 logger.info("Kafka stream successfully initialized.")
 
-# Kafka Payload parsen
-parsed_df = raw_df.selectExpr(
-    "CAST(key AS STRING) AS kafka_key",
-    "CAST(value AS STRING) AS kafka_value",
-    "partition",
-    "offset"
+# JSON Parsing & Schema
+# Struktur der Kafka-Nachricht
+schema = (
+    StructType()
+    .add("sensor_id", StringType())
+    .add("temperature", DoubleType())
+    .add("salinity", DoubleType())
+    .add("timestamp", TimestampType())
 )
 
-# Definiton Schema
-schema = StructType() \
-    .add("sensor_id", StringType()) \
-    .add("temperature", DoubleType()) \
-    .add("salinity", DoubleType()) \
-    .add("timestamp", TimestampType())
-
-# JSON Payload entpacken
-json_df = parsed_df.select(
-    "partition",
-    "offset",
-    "kafka_key",
-    from_json(col("kafka_value"), schema).alias("data")
-).select(
-    "partition",
-    "offset",
-    "kafka_key",
-    col("data.*")
+# JSON-String aus Kafka ("value") wird in Spalten aufgelöst
+json_df = (
+    raw_df.selectExpr("CAST(value AS STRING) AS kafka_value")
+    .select(from_json(col("kafka_value"), schema).alias("data"))
+    .select("data.*")
 )
 
 # Fensterbasierte Aggregationen
-windowed_df = json_df \
-    .withWatermark("timestamp", "1 minute") \
+# Aggregation in 30-Sekunden-Zeitfenstern pro Sensor
+# Berechnet Durchschnitt, Minimum und Maximum der Temperatur & Salinität
+windowed_df = (
+    json_df
+    .withWatermark("timestamp", "1 minute")  # erlaubt 1 Minute "late data"
     .groupBy(
         col("sensor_id"),
         window(col("timestamp"), "30 seconds")
-    ) \
+    )
     .agg(
         round(avg("temperature"), 2).alias("avg_temp"),
         round(min("temperature"), 2).alias("min_temp"),
         round(max("temperature"), 2).alias("max_temp"),
         round(avg("salinity"), 2).alias("avg_salinity")
     )
+)
 
-# Fenster flatten für Cassandra
-windowed_df_flat = windowed_df \
-    .withColumn("window_start", col("window.start")) \
-    .withColumn("window_end", col("window.end")) \
+# Flatten des Fensterobjekts (Start/Ende als separate Spalten)
+windowed_df_flat = (
+    windowed_df
+    .withColumn("window_start", col("window.start"))
+    .withColumn("window_end", col("window.end"))
     .drop("window")
+)
 
-# Anomalien erkennen und Schreiben in Cassandra
+# Anomalie-Erkennung
+# Filtert Sensorwerte, deren Temperatur außerhalb des "normalen" Bereichs lieg
 anomalies_df = json_df.filter((col("temperature") > 9.5) | (col("temperature") < 2.5))
 
-# Funktionen schreiben
+ # Cassandra Write-Funktionen
 def write_to_cassandra(batch_df, batch_id):
+    """Schreibt aggregierte Sensordaten nach Cassandra."""
     try:
         logger.info(f"Writing batch {batch_id} to Cassandra (aggregates)...")
         batch_df.write \
             .format("org.apache.spark.sql.cassandra") \
             .mode("append") \
-            .option("keyspace", "sensordata") \
-            .option("table", "sensor_aggregates") \
-            .option("spark.cassandra.connection.host", "cassandra") \
-            .option("spark.cassandra.connection.port", "9042") \
-            .option("spark.cassandra.auth.username", cassandra_user) \
-            .option("spark.cassandra.auth.password", cassandra_pass) \
-            .save()
-        logger.info(f"Batch {batch_id} successfully written to sensor_aggregates.")
+            .options(
+                keyspace="sensordata",
+                table="sensor_aggregates",
+                **{
+                    "spark.cassandra.connection.host": CASSANDRA_HOST,
+                    "spark.cassandra.connection.port": CASSANDRA_PORT,
+                    "spark.cassandra.auth.username": CASSANDRA_USER,
+                    "spark.cassandra.auth.password": CASSANDRA_PASS,
+                }
+            ).save()
+        logger.info(f"Batch {batch_id} written to sensor_aggregates.")
     except Exception as e:
-        logger.error(f"Error writing batch {batch_id} to Cassandra: {e}", exc_info=True)
+        logger.error(f"Error writing batch {batch_id}: {e}", exc_info=True)
+
 
 def write_anomalies_to_cassandra(batch_df, batch_id):
+    """Schreibt erkannte Anomalien in Cassandra."""
+    if batch_df.isEmpty():
+        return
     try:
-        if batch_df.count() == 0:
-            return
-        logger.warning(f"Detected {batch_df.count()} anomalies in batch {batch_id}. Writing to Cassandra...")
-        cleaned_df = batch_df.select("sensor_id", "temperature", "salinity", "timestamp")
-        cleaned_df.write \
+        logger.warning(f"Detected anomalies in batch {batch_id}. Writing to Cassandra...")
+        batch_df.select("sensor_id", "temperature", "salinity", "timestamp") \
+            .write \
             .format("org.apache.spark.sql.cassandra") \
             .mode("append") \
-            .option("keyspace", "sensordata") \
-            .option("table", "sensor_anomalies") \
-            .option("spark.cassandra.connection.host", "cassandra") \
-            .option("spark.cassandra.connection.port", "9042") \
-            .option("spark.cassandra.auth.username", "cassandra") \
-            .option("spark.cassandra.auth.password", "cassandra") \
-            .save()
+            .options(
+                keyspace="sensordata",
+                table="sensor_anomalies",
+                **{
+                    "spark.cassandra.connection.host": CASSANDRA_HOST,
+                    "spark.cassandra.connection.port": CASSANDRA_PORT,
+                    "spark.cassandra.auth.username": CASSANDRA_USER,
+                    "spark.cassandra.auth.password": CASSANDRA_PASS,
+                }
+            ).save()
         logger.info(f"Anomalies batch {batch_id} written to Cassandra.")
     except Exception as e:
         logger.error(f"Error writing anomalies batch {batch_id}: {e}", exc_info=True)
 
-# Ausgabe an Konsole
-query_console = windowed_df.writeStream \
-    .outputMode("update") \
-    .format("console") \
-    .option("truncate", "false") \
-    .option("numRows", 20) \
-    .option("checkpointLocation", "file:///tmp/spark-checkpoint/console") \
+# Konsolen-Output → zeigt aktuelle Aggregationen im Terminal
+query_console = (
+    windowed_df.writeStream
+    .outputMode("update")
+    .format("console")
+    .option("truncate", "false")
+    .option("numRows", 20)
+    .option("checkpointLocation", "file:///tmp/spark-checkpoint/console")
     .start()
+)
 
-# Stream Aggregationen
-query_agg = windowed_df_flat.writeStream \
-    .outputMode("update") \
-    .foreachBatch(write_to_cassandra) \
-    .option("checkpointLocation", "file:///tmp/spark-checkpoint/sensor_agg") \
+# Aggregationen → Cassandra schreiben
+query_agg = (
+    windowed_df_flat.writeStream
+    .outputMode("update")
+    .foreachBatch(write_to_cassandra)
+    .option("checkpointLocation", "file:///tmp/spark-checkpoint/sensor_agg")
     .start()
+)
 
-# Schreiben der Anomalien
-query_anomalies = anomalies_df.writeStream \
-    .outputMode("append") \
-    .foreachBatch(write_anomalies_to_cassandra) \
-    .option("checkpointLocation", "file:///tmp/spark-checkpoint/anomalies") \
+# Anomalien → Cassandra schreiben
+query_anomalies = (
+    anomalies_df.writeStream
+    .outputMode("append")
+    .foreachBatch(write_anomalies_to_cassandra)
+    .option("checkpointLocation", "file:///tmp/spark-checkpoint/anomalies")
     .start()
+)
 
-# KEEP STREAM ALIVE
+# Streaming aktiv halten
 query_console.awaitTermination()
 query_agg.awaitTermination()
 query_anomalies.awaitTermination()

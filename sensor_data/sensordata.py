@@ -1,3 +1,30 @@
+"""
+Dieses Skript simuliert Sensordaten (Temperatur & Salzgehalt)
+von mehreren Sensoren und sendet sie als JSON-Nachrichten an
+ein Kafka-Topic namens "sensor-data".
+
+Funktion:
+- Generiert fortlaufend zufällige Messwerte.
+- Sendet diese über einen KafkaProducer an den Broker.
+- Läuft kontinuierlich, bis es manuell gestoppt wird (CTRL+C).
+
+Parameter:
+- Kafka-Broker:  kafka:9092
+- Topic:         sensor-data
+- Sensoren:      SENSOR-01 bis SENSOR-03
+- Intervall:     1 Sekunde
+
+Abhängigkeit:
+- kafka-python (siehe requirements.txt)
+
+Beispielausgabe:
+2025-11-10 10:45:12 [INFO] Send: {'sensor_id': 'SENSOR-01', ...}
+
+Hinweise:
+- Dient der Simulation und zum Testen von Kafka-Datenpipelines.
+- In Produktivsystemen sollten zusätzliche Sicherheitsmaßnahmen wie SSL-Verschlüsselung eingestzt werden
+"""
+
 import time
 import json
 import random
@@ -17,10 +44,10 @@ logging.basicConfig(
 try:
     producer = KafkaProducer(
         bootstrap_servers=["kafka:9092"],
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-        key_serializer=lambda k: k.encode("utf-8") #Partitionierung
+        value_serializer=lambda v: json.dumps(v).encode("utf-8"), # wandelt Python-Daten in JSON um
+        key_serializer=lambda k: k.encode("utf-8") # Partitionierung nach Sensor-ID
     )
-    logging.info("Connected to Kafka broker")
+    logging.info("Connected to Kafka broker via TLS")
 except NoBrokersAvailable:
     logging.error("Connection to Broker failed")
     exit(1)
@@ -29,8 +56,10 @@ except KafkaError as e:
     exit(1)
 
 # Simulationsparameter
+# Liste Sensoren
 sensor_ids = ["SENSOR-01", "SENSOR-02", "SENSOR-03"]
 
+# Endlosschleife: sendet kontinuierlich Sensordaten
 try:
     while True:
         # Zufällig einen Sensor wählen
@@ -40,7 +69,7 @@ try:
         salinity = round(random.uniform(31.0, 35.0), 2)
         timestamp = datetime.now(timezone.utc).isoformat()
 
-        # Datenstruktur aufbauen
+        # Datenstruktur aufbauen (JSON-kompatibel)
         data = {
             "sensor_id": sensor_id,
             "timestamp": timestamp,
@@ -48,6 +77,7 @@ try:
             "salinity": salinity
         }
 
+# Nachricht an Kafka senden, Topic: "sensor-data", key: sensor_id (bestimmt Partition), value: Datensatz (JSON)
         try:
             producer.send("sensor-data", key=sensor_id, value=data)
             logging.info(f"Send: {data}")
@@ -55,10 +85,11 @@ try:
             logging.error(f"Error while sending: {e}")
             exit(1)
 
-        # Eine Sekunde warten
+        # Eine Sekunde warten, bevor der nächste Datensatz gesendet wird
         time.sleep(1)
 
+# Sicherstellen, dass alle Nachrichten gesendet und die Verbindung sauber geschlossen wird
 finally:
-    producer.flush()
-    producer.close()
+    producer.flush() # Sendet alle noch ausstehenden Nachrichten
+    producer.close() # Schließt die Kafka-Verbindung
     logging.info("Kafka producer closed.")
