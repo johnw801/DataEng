@@ -184,6 +184,6 @@ Ebenso können zusätzliche Kafka-Broker definiert werden.
 
 ## Autor
 
-Erstellt im Rahmen des Moduls ** Projekt: Data Engineering**
+Erstellt im Rahmen des Moduls **Projekt: Data Engineering**
 von J.W.
 
