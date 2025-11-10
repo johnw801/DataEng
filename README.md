@@ -22,9 +22,11 @@ Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien p
 
 ---
 
-## Ordnerstruktur
+### Ordnerstruktur
 
 ```bash
+project-root/
+│
 ├── sensor_data/
 │   ├── Dockerfile             # Image-Build für den Sensor-Simulator
 │   ├── requirements.txt       # Python-Abhängigkeiten
@@ -45,7 +47,7 @@ Vor dem Start sollten folgende Tools installiert werden:
 
 | Komponente            | Empfehlung                  | Hinweis                                                          |
 | --------------------- | --------------------------- | ---------------------------------------------------------------- |
-| **Docker Desktop**    | ≥ 4.x                       | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
+| **Docker Desktop**    | ≥ 4.x/ mind. 4 GB RAM       | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
 | **Java JDK 11**       | Zwingend erforderlich       | Spark benötigt Java 11 zur Laufzeit                              |
 | **Python 3.9+**       | Optional                    | Nur nötig, wenn Code außerhalb von Docker getesten werden soll   |
 
@@ -53,7 +55,13 @@ Vor dem Start sollten folgende Tools installiert werden:
 
 ## Setup & Ausführung
 
-### 1️. Projekt starten
+**Wichtige Hinweise zum Startverhalten:**
+
+- Der vollständige Start aller Services kann bis zu 5 Minuten dauern.
+- Der Sensor-Simulator hat einen Startverzögerungstimer von 2 Minuten, damit alle abhängigen Services (Kafka, Spark, Cassandra) korrekt initialisiert sind bevor Daten gesendet werden.
+- Innerhalb dieser 2 Minuten sollte bei Erstinitialisierung die u.g. Cassandra `init.cql` ausgeführt werden.
+
+### 1️. Starten der Container
 
 ```bash
 docker compose up --build -d
@@ -65,7 +73,8 @@ Alle Container werden gebaut und gestartet. Healthchecks sorgen dafür, dass Ser
 
 ### 2. Cassandra initialisieren
 
-Bei der **erstmaligen Initialisierung**:
+Bei der **erstmaligen Initialisierung:** 
+Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **2 Minuten** dauern. Danach folgenden Befehl ausführen:
 
 ```bash
 docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
@@ -91,23 +100,15 @@ Für die Überwachung der Services wird Docker Desktop empfohlen.
 **Alternativ:**
 * **Logs anzeigen:**
 
-  ```bash
-  docker logs -f sensor-simulator
-  docker logs -f spark-submit-job
-  ```
+```bash
+docker logs -f sensor-simulator
+docker logs -f spark-submit-job
+```
 * **Cassandra-Client öffnen:**
 
-  ```bash
-  docker exec -it cassandra cqlsh
-  ```
-
----
-
-## Netzwerksicherheit
-
-* Standardmäßig sind **alle externen Ports deaktiviert** (außer Cassandra-Port `9042` für PyCharm).
-* Ports können bei Bedarf in `docker-compose.yml` aktiviert werden.
-* Kafka und Spark Web-UIs sind **optional** (siehe unten).
+```bash
+docker exec -it cassandra cqlsh
+```
 
 ---
 
@@ -164,6 +165,23 @@ CASSANDRA_PASSWORD=<dein_passwort>
 
 * **Alternative Cassandra-Konfiguration:** Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
   Dies ist **nicht empfohlen** und sollte nur zu Testzwecken verwendet werden.
+
+### Netzwerksicherheit
+
+* Standardmäßig sind **alle externen Ports deaktiviert** (außer Cassandra-Port `9042` für PyCharm-Integration) um Netzwerkisolation zu wahren.
+* Ports können bei Bedarf in `docker-compose.yml` aktiviert werden.
+* Kafka und Spark Web-UIs sind **optional** (siehe oben).
+
+### Datenverschlüsselung
+
+Für Produktivumgebungen wird empfohlen:
+
+- SSL/TLS-Verschlüsselung zwischen allen Diensten zu aktivieren (Kafka, Spark, Cassandra)
+
+- Verschlüsselung gespeicherter Daten (at rest) in Cassandra zu nutzen
+
+Diese Sicherheitsmechanismen erfordern die Einrichtung geeigneter Zertifikate und Schlüsseldateien (z. B. JKS oder PEM) zur Authentifizierung und Verschlüsselung.
+
 ---
 
 ## Skalierbarkeit
@@ -186,5 +204,4 @@ Ebenso können zusätzliche Kafka-Broker definiert werden.
 
 ## Autor
 
-Erstellt im Rahmen des Moduls **Projekt: Data Engineering**
-von J.W.
+Erstellt im Rahmen des Moduls **Projekt: Data Engineering** © 2025 – J.W.
