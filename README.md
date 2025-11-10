@@ -26,6 +26,8 @@ Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien p
 
 ```bash
 ├── sensor_data/
+│   ├── Dockerfile             # Image-Build für den Sensor-Simulator
+│   ├── requirements.txt       # Python-Abhängigkeiten
 │   └── sensordata.py          # Sensor-Simulator (Kafka Producer)
 ├── spark/
 │   └── spark_kafka_consumer.py # Spark Streaming Job
@@ -186,4 +188,3 @@ Ebenso können zusätzliche Kafka-Broker definiert werden.
 
 Erstellt im Rahmen des Moduls **Projekt: Data Engineering**
 von J.W.
-
