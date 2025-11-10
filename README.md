@@ -83,9 +83,9 @@ Alle Container werden gebaut und gestartet.
 ---
 ### 2. Cassandra initialisieren
 
-Bei der **erstmaligen Initialisierung:** 
+- Bei der **erstmaligen Initialisierung:** 
 
-Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **2 Minuten** dauern. 
+- Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **2 Minuten** dauern. 
 
 Danach folgenden Befehl ausführen:
 
