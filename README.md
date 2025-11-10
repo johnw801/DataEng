@@ -1,4 +1,5 @@
 # DataEng – Echtzeit Data Engineering Pipeline
+## Beschreibung
 
 Dieses Projekt demonstriert eine vollständige Streaming Data Pipeline mit Kafka, Apache Spark Structured Streaming und Cassandra. Ozeanographische Sensordaten werden simuliert, über Kafka gestreamt, von Spark verarbeitet und in Cassandra gespeichert.
 
@@ -21,7 +22,6 @@ Spark Structured Streaming liest kontinuierlich die Daten aus Kafka, führt Bere
 Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien persistent in den Tabellen sensor_aggregates und sensor_anomalies.
 
 ---
-
 ### Ordnerstruktur
 
 ```bash
@@ -40,7 +40,7 @@ project-root/
 ├── docker-compose.yaml        # Service-Konfiguration
 └── .env                       # Muss manuell angelegt werden (Cassandra-Credentials)
 ```
-
+---
 ### Verwendete Docker Images
 - cassandra:4.1
 - confluentinc/cp-kafka:8.1.0
@@ -50,7 +50,6 @@ project-root/
 - Optional: provectuslabs/kafka-ui:latest
 
 ---
-
 ## Voraussetzungen
 
 Vor dem Start sollten folgende Tools installiert werden:
