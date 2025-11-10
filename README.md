@@ -136,8 +136,7 @@ docker compose down
 docker compose down -v # inkl. löschen von Volumes
 ```
 
-
-
+---
 
 **Wichtige Cassandra Befehle**
 
