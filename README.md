@@ -84,7 +84,10 @@ Alle Container werden gebaut und gestartet.
 ### 2. Cassandra initialisieren
 
 Bei der **erstmaligen Initialisierung:** 
-Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **2 Minuten** dauern. Danach folgenden Befehl ausführen:
+
+Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **2 Minuten** dauern. 
+
+Danach folgenden Befehl ausführen:
 
 ```bash
 docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
