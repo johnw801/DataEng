@@ -47,7 +47,7 @@ project-root/
 - bde2020/spark-master:3.3.0-hadoop3.3
 - bde2020/spark-worker:3.3.0-hadoop3.3
 - bde2020/spark-submit:3.3.0-hadoop3.3
-- Optional: provectuslabs/kafka-ui:latest
+- provectuslabs/kafka-ui:latest (optional)
 
 ---
 ## Voraussetzungen
@@ -243,13 +243,13 @@ CASSANDRA_PASSWORD=<dein_passwort>
 
 * **Alternative Cassandra-Konfiguration:** Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
   Dies ist **nicht empfohlen** und sollte nur zu Testzwecken verwendet werden.
-
+---
 ### Netzwerksicherheit
 
 * Standardmäßig sind **alle externen Ports deaktiviert** (außer Cassandra-Port `9042` für PyCharm-Integration) um Netzwerkisolation zu wahren.
 * Ports können bei Bedarf in `docker-compose.yml` aktiviert werden.
 * Kafka und Spark Web-UIs sind **optional** (siehe oben).
-
+---
 ### Datenverschlüsselung
 
 Für Produktivumgebungen wird empfohlen:
