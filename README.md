@@ -102,10 +102,42 @@ Für die Überwachung der Services wird Docker Desktop empfohlen.
 docker logs -f sensor-simulator
 docker logs -f spark-submit-job
 ```
-* **Cassandra-Client öffnen:**
+**Wichtige Cassandra Befehle**
+
+Cassandra-Client öffnen:
 
 ```bash
 docker exec -it cassandra cqlsh
+```
+
+Alle Keyspaces anzeigen:
+
+```bash
+DESCRIBE KEYSPACES;
+```
+
+In Keyspace wechseln:
+
+```bash
+USE sensordata;
+```
+
+Tabellen anzeigen:
+
+```bash
+DESCRIBE TABLES;
+```
+
+Struktur einer Tabelle anzeigen:
+
+```bash
+DESCRIBE TABLE sensor_aggregates;
+```
+
+Daten ansehen:
+
+```bash
+SELECT * FROM sensor_aggregates LIMIT 10;
 ```
 
 ---
