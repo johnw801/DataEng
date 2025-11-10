@@ -16,9 +16,10 @@ WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 GRANT SELECT ON KEYSPACE sensordata TO myuser;
 GRANT MODIFY ON KEYSPACE sensordata TO myuser;
 
--- Tabellen erstellen
+-- Tabellen erstellen unter keyspace sensordata
 USE sensordata;
 
+-- Tabelle aggregierte Werte
 CREATE TABLE IF NOT EXISTS sensor_aggregates (
     sensor_id text,
     window_start timestamp,
@@ -30,6 +31,7 @@ CREATE TABLE IF NOT EXISTS sensor_aggregates (
     PRIMARY KEY (sensor_id, window_start)
 );
 
+-- Tabelle Anomalien
 CREATE TABLE IF NOT EXISTS sensor_anomalies (
     sensor_id text,
     temperature double,

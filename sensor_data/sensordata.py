@@ -1,12 +1,12 @@
 """
 Dieses Skript simuliert Sensordaten (Temperatur & Salzgehalt)
 von mehreren Sensoren und sendet sie als JSON-Nachrichten an
-ein Kafka-Topic namens "sensor-data".
+das Kafka-Topic "sensor-data".
 
 Funktion:
-- Generiert fortlaufend zufällige Messwerte.
+- Generiert kontinuerlich zufällige Messwerte.
 - Sendet diese über einen KafkaProducer an den Broker.
-- Läuft kontinuierlich, bis es manuell gestoppt wird (CTRL+C).
+- Läuft kontinuierlich, bis es manuell gestoppt wird
 
 Parameter:
 - Kafka-Broker:  kafka:9092
@@ -33,7 +33,7 @@ from datetime import datetime, timezone
 from kafka import KafkaProducer
 from kafka.errors import KafkaError, NoBrokersAvailable
 
-#Logging einrichten(B)
+# Logging einrichten
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -43,11 +43,11 @@ logging.basicConfig(
 # Kafka-Producer initialisieren
 try:
     producer = KafkaProducer(
-        bootstrap_servers=["kafka:9092"],
+        bootstrap_servers=["kafka:9092"],       # Verbindet Producer mit Kafka-Broker
         value_serializer=lambda v: json.dumps(v).encode("utf-8"), # wandelt Python-Daten in JSON um
         key_serializer=lambda k: k.encode("utf-8") # Partitionierung nach Sensor-ID
     )
-    logging.info("Connected to Kafka broker via TLS")
+    logging.info("Connected to Kafka broker")
 except NoBrokersAvailable:
     logging.error("Connection to Broker failed")
     exit(1)
@@ -64,7 +64,7 @@ try:
     while True:
         # Zufällig einen Sensor wählen
         sensor_id = random.choice(sensor_ids)
-        # Zufällige Messwerte generieren
+        # Zufällige Messwerte generieren (Temp + Salzgehalt)
         temperature = round(random.uniform(2.0, 10.0), 2)
         salinity = round(random.uniform(31.0, 35.0), 2)
         timestamp = datetime.now(timezone.utc).isoformat()
@@ -85,11 +85,11 @@ try:
             logging.error(f"Error while sending: {e}")
             exit(1)
 
-        # Eine Sekunde warten, bevor der nächste Datensatz gesendet wird
+        # Eine Sekunde warten bevor nächster Datensatz gesendet wird
         time.sleep(1)
 
 # Sicherstellen, dass alle Nachrichten gesendet und die Verbindung sauber geschlossen wird
 finally:
-    producer.flush() # Sendet alle noch ausstehenden Nachrichten
+    producer.flush() # Sendet alle ausstehenden Nachrichten
     producer.close() # Schließt die Kafka-Verbindung
     logging.info("Kafka producer closed.")

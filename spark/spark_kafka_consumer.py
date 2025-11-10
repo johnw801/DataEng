@@ -7,7 +7,7 @@ führt zeitfensterbasierte Aggregationen (Temperatur/Salzgehalt) durch,
 erkennt Temperatur-Anomalien und schreibt Ergebnisse in Cassandra-Tabellen.
 
 Komponenten:
-- Kafka  → Datenquelle (JSON-Messages)
+- Kafka  → Datenquelle (JSON)
 - Spark  → Stream-Verarbeitung & Aggregation
 - Cassandra → Persistente Speicherung
 
@@ -19,12 +19,12 @@ Parameter:
 
 Abhängigkeiten:
 - pyspark
-- kafka-python (Kafka-Producer, wenn simuliert)
 - Cassandra Connector für Spark
 
 Hinweise:
 - Authentifizierungsdaten (Cassandra) werden über Umgebungsvariablen
   `CASSANDRA_USER` und `CASSANDRA_PASSWORD` eingelesen.
+- Für produktive Nutzung: SSL- oder SASL-Auth aktivieren
 """
 
 import os
@@ -81,7 +81,7 @@ raw_df = (
 logger.info("Kafka stream successfully initialized.")
 
 # JSON Parsing & Schema
-# Struktur der Kafka-Nachricht
+# JSON aus Kafka in Spalten umwandeln
 schema = (
     StructType()
     .add("sensor_id", StringType())
