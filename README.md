@@ -219,7 +219,7 @@ Zugriff anschließend über [http://localhost:8085](http://localhost:8085)
 
 ## Zugangsdaten & Sicherheit
 
-* Standardpasswort für Cassandra:
+Standardpasswort für Cassandra:
 
 ```
 initialespasswortbitteaendern
@@ -230,13 +230,13 @@ initialespasswortbitteaendern
 * Nach dem Ausführen von `init.cql` werden eine `admin` Rolle und eine Userrolle `myuser` (least privilege) für den Zugriff auf die Cassandra DB erstellt.
 * Für den Produktiveinsatz wird dringend empfohlen den Standard Cassandra-Superuser zu löschen oder zu deaktivieren. Dafür wird das Skript `deletesuperuser.cql` bereitgestellt.
 
-* Kafka Log-Retention:
+Kafka Log-Retention:
 
 ```
 24 Stunden (Datenschutz-konform)
 ```
 
-* .env-Datei: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
+.env-Datei: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
 Sie enthält sensible Umgebungsvariablen:
 
 ```
