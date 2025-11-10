@@ -70,6 +70,7 @@ Vor dem Start sollten folgende Tools installiert werden:
 Bei langsameren Hostsystemen kann dieser Wert bei Bedarf erhöht werden.
 - Innerhalb dieser 2 Minuten sollte bei Erstinitialisierung die u.g. Cassandra `init.cql` ausgeführt werden.
 - Healthchecks sorgen dafür, dass Services in der richtigen Reihenfolge initialisiert werden.
+  
 ---
 ### 1️. Starten der Container
 
@@ -78,6 +79,7 @@ docker compose up --build -d
 ```
 
 Alle Container werden gebaut und gestartet.
+
 ---
 ### 2. Cassandra initialisieren
 
