@@ -236,7 +236,7 @@ Kafka Log-Retention:
 24 Stunden (Datenschutz-konform)
 ```
 
-.env-Datei: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
+**.env-Datei**: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
 Sie enthält sensible Umgebungsvariablen:
 
 ```
@@ -244,8 +244,11 @@ CASSANDRA_USER=<dein_benutzername>
 CASSANDRA_PASSWORD=<dein_passwort>
 ```
 
-* **Alternative Cassandra-Konfiguration:** Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
+**Alternative Cassandra-Konfiguration:** 
+
+Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
   Dies ist **nicht empfohlen** und sollte nur zu Testzwecken verwendet werden.
+  
 ---
 ### Netzwerksicherheit
 
