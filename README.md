@@ -95,12 +95,50 @@ docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /deletesuperuser.cq
 Für die Überwachung der Services wird Docker Desktop empfohlen.
 
 **Alternativ:**
-* **Logs anzeigen:**
+
+**Wichtige Dockerbefehle**
+
+Container-Status prüfen:
+
+```bash
+docker ps
+```
+
+Logs anzeigen:
 
 ```bash
 docker logs -f sensor-simulator
 docker logs -f spark-submit-job
+docker logs -f cassandra
+docker logs -f kafka
 ```
+
+Container neu starten:
+
+```bash
+docker restart kafka # einzelnen Container neustarten
+docker restart $(docker ps -q) # alle Container neustarten
+```
+
+Container starten/stoppen (ohne Löschen):
+
+```bash
+docker start kafka # einzelnen Container starten
+docker start $(docker ps -a -q) # alle Container starten
+docker stop kafka # einzelnen Container stoppen
+docker stop $(docker ps -q) # alle Container stoppen
+```
+
+Alle Container stoppen und löschen:
+
+```bash
+docker compose down
+docker compose down -v # inkl. löschen von Volumes
+```
+
+
+
+
 **Wichtige Cassandra Befehle**
 
 Cassandra-Client öffnen:
