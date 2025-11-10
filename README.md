@@ -1,6 +1,6 @@
 # DataEng – Echtzeit Data Engineering Pipeline
 
-Dieses Projekt demonstriert eine vollständige **Streaming Data Pipeline** mit **Kafka**, **Apache Spark Structured Streaming** und **Cassandra**. Ozeanographische Sensordaten werden simuliert, über Kafka gestreamt, von Spark verarbeitet und in Cassandra gespeichert.
+Dieses Projekt demonstriert eine vollständige Streaming Data Pipeline mit Kafka, Apache Spark Structured Streaming und Cassandra. Ozeanographische Sensordaten werden simuliert, über Kafka gestreamt, von Spark verarbeitet und in Cassandra gespeichert.
 
 ---
 ## Architekturüberblick
@@ -48,7 +48,6 @@ Vor dem Start sollten folgende Tools installiert werden:
 | Komponente            | Empfehlung                  | Hinweis                                                          |
 | --------------------- | --------------------------- | ---------------------------------------------------------------- |
 | **Docker Desktop**    | ≥ 4.x/ mind. 4 GB RAM       | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
-| **Java JDK 11**       | Zwingend erforderlich       | Spark benötigt Java 11 zur Laufzeit                              |
 | **Python 3.9+**       | Optional                    | Nur nötig, wenn Code außerhalb von Docker getesten werden soll   |
 
 ---
@@ -57,8 +56,8 @@ Vor dem Start sollten folgende Tools installiert werden:
 
 **Wichtige Hinweise zum Startverhalten:**
 
-- Der vollständige Start aller Services kann bis zu 5 Minuten dauern.
-- Der Sensor-Simulator hat einen Startverzögerungstimer von 2 Minuten, damit alle abhängigen Services (Kafka, Spark, Cassandra) korrekt initialisiert sind bevor Daten gesendet werden.
+- Der vollständige Start aller Services kann bis zu **5 Minuten** dauern.
+- Der Sensor-Simulator hat einen Startverzögerungstimer von **2 Minuten**, damit alle abhängigen Services (Kafka, Spark, Cassandra) korrekt initialisiert sind bevor Daten gesendet werden.
 Bei langsameren Hostsystemen kann dieser Wert bei Bedarf erhöht werden.
 - Innerhalb dieser 2 Minuten sollte bei Erstinitialisierung die u.g. Cassandra `init.cql` ausgeführt werden.
 - Healthchecks sorgen dafür, dass Services in der richtigen Reihenfolge initialisiert werden.
