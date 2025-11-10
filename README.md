@@ -79,8 +79,6 @@ docker compose up --build -d
 
 Alle Container werden gebaut und gestartet.
 
----
-
 ### 2. Cassandra initialisieren
 
 Bei der **erstmaligen Initialisierung:** 
