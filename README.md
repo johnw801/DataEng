@@ -3,20 +3,26 @@
 Dieses Projekt demonstriert eine vollständige **Streaming Data Pipeline** mit **Kafka**, **Apache Spark Structured Streaming** und **Cassandra**. Ozeanographische Sensordaten werden simuliert, über Kafka gestreamt, von Spark verarbeitet und in Cassandra gespeichert.
 
 ---
-
 ## Architekturüberblick
 
-**Komponenten:**
+### Datenfluss:
+Sensor-Simulator → Kafka → Spark Structured Streaming → Cassandra
 
-* **Sensor Simulator:** generiert kontinuierlich Zufallsdaten (Temperatur & Salzgehalt)
-* **Kafka (KRaft-Modus):** empfängt & verteilt Streaming-Daten
-* **Spark:** liest Kafka-Streams, aggregiert Messwerte und erkennt Anomalien
-* **Cassandra:** speichert aggregierte Daten und Anomalien
-* **Docker Compose:** orchestriert alle Services in einer isolierten Netzwerkumgebung
+Sensor-Simulator sendet fortlaufend JSON-Messwerte (Temperatur, Salzgehalt) von drei simulierten Sensoren an Kafka.
+
+Kafka dient als Message-Broker für den Echtzeit-Datenstrom.
+
+Spark Structured Streaming liest kontinuierlich die Daten aus Kafka, führt Berechnungen und Aggregationen durch:
+
+Berechnung von Durchschnitts-, Minimal- und Maximalwerten pro Sensor in 30-Sekunden-Zeitfenstern.
+
+Erkennung von Anomalien, wenn Temperaturwerte außerhalb des normalen Bereichs ( <2.5 °C oder >9.5 °C) liegen.
+
+Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien persistent in den Tabellen sensor_aggregates und sensor_anomalies.
 
 ---
 
-## ⚙️ Voraussetzungen
+## Voraussetzungen
 
 Vor dem Start sollten folgende Tools installiert sein:
 
@@ -28,7 +34,7 @@ Vor dem Start sollten folgende Tools installiert sein:
 
 ---
 
-## 🏁 Setup & Ausführung
+## Setup & Ausführung
 
 ### 1️. Projekt starten
 
