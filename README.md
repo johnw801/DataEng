@@ -80,7 +80,7 @@ Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **
 ```bash
 docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
 ```
-Erstellung der Tabellen `sensor_aggregates` und `sensor_anomalies` sowie der Standarduser `admin` und `myuser` (User mit least privilege Rechten)
+Erstellung des keyspaces `sensordata`, der Tabellen `sensor_aggregates` und `sensor_anomalies` sowie der Standarduser `admin` und `myuser` (User mit least privilege Rechten)
 
 
 Optional kann der Cassandra Standard-Superuser entfernt werden:
