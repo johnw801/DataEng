@@ -14,23 +14,38 @@ Kafka dient als Message-Broker für den Echtzeit-Datenstrom.
 
 Spark Structured Streaming liest kontinuierlich die Daten aus Kafka, führt Berechnungen und Aggregationen durch:
 
-Berechnung von Durchschnitts-, Minimal- und Maximalwerten pro Sensor in 30-Sekunden-Zeitfenstern.
+- Berechnung von Durchschnitts-, Minimal- und Maximalwerten pro Sensor in 30-Sekunden-Zeitfenstern.
 
-Erkennung von Anomalien, wenn Temperaturwerte außerhalb des normalen Bereichs ( <2.5 °C oder >9.5 °C) liegen.
+- Erkennung von Anomalien, wenn Temperaturwerte außerhalb des normalen Bereichs ( <2.5 °C oder >9.5 °C) liegen.
 
 Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien persistent in den Tabellen sensor_aggregates und sensor_anomalies.
 
 ---
 
+## Ordnerstruktur
+
+```bash
+├── sensor_data/
+│   └── sensordata.py          # Sensor-Simulator (Kafka Producer)
+├── spark/
+│   └── spark_kafka_consumer.py # Spark Streaming Job
+├── cassandra/
+│   ├── init.cql               # Initialisierung des Keyspace & Tabellen
+│   ├── cassandra.yaml         # Benutzerdefinierte Konfiguration (optional entfernbar)
+│   └── deletesuperuser.cql    # Optional: Entfernt Cassandra Superuser
+├── docker-compose.yaml        # Service-Konfiguration
+└── .env                       # Muss manuell angelegt werden (Cassandra-Credentials)
+```
+
 ## Voraussetzungen
 
-Vor dem Start sollten folgende Tools installiert sein:
+Vor dem Start sollten folgende Tools installiert werden:
 
 | Komponente            | Empfehlung                  | Hinweis                                                          |
 | --------------------- | --------------------------- | ---------------------------------------------------------------- |
 | **Docker Desktop**    | ≥ 4.x                       | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
 | **Java JDK 11**       | Zwingend erforderlich       | Spark benötigt Java 11 zur Laufzeit                              |
-| **Python 3.9+**       | Optional                    | Nur nötig, wenn du den Code außerhalb von Docker testen möchtest |
+| **Python 3.9+**       | Optional                    | Nur nötig, wenn Code außerhalb von Docker getesten werden soll   |
 
 ---
 
@@ -71,7 +86,7 @@ docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /deletesuperuser.cq
 ### 3. Services überwachen
 Für die Überwachung der Services wird Docker Desktop empfohlen.
 
-* **Alternativ:**
+**Alternativ:**
 * **Logs anzeigen:**
 
   ```bash
@@ -125,20 +140,28 @@ Zugriff anschließend über [http://localhost:8085](http://localhost:8085)
 
 * Standardpasswort für Cassandra:
 
-  ```
-  initialespasswortbitteaendern
-  ```
+```
+initialespasswortbitteaendern
+```
 
   → **Bitte unbedingt ändern!**
 
 * Kafka Log-Retention:
 
-  ```
-  24 Stunden (Datenschutz-konform)
-  ```
+```
+24 Stunden (Datenschutz-konform)
+```
 
-* `.env` enthält sensible Variablen (`CASSANDRA_USER`, `CASSANDRA_PASSWORD`)
+* .env-Datei: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
+Sie enthält sensible Umgebungsvariablen:
 
+```
+CASSANDRA_USER=<dein_benutzername>
+CASSANDRA_PASSWORD=<dein_passwort>
+```
+
+* **Alternative Cassandra-Konfiguration:** Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
+  Dies ist **nicht empfohlen** und sollte nur zu Testzwecken verwendet werden.
 ---
 
 ## Skalierbarkeit
@@ -159,32 +182,8 @@ Ebenso können zusätzliche Kafka-Broker definiert werden.
 
 ---
 
-## Datenfluss
-
-```text
-[Sensoren → Kafka → Spark Streaming → Cassandra]
-```
-
-* Sensor simuliert Messwerte (JSON)
-* Kafka verteilt Daten an Spark
-* Spark aggregiert & erkennt Anomalien
-* Cassandra speichert Ergebnisse dauerhaft
-
----
-
-## Hinweise
-
-* **Docker Desktop wird dringend empfohlen**, da es alle benötigten Dienste lokal bündelt.
-* **Java JDK 11 ist zwingend erforderlich**, da Spark darauf basiert.
-  Überprüfe die Installation mit:
-
-  ```bash
-  java -version
-  # Ausgabe sollte ähnlich lauten: openjdk version "11.0.x"
-  ```
-
-
 ## Autor
 
-Erstellt im Rahmen des Moduls **Data Engineering**
+Erstellt im Rahmen des Moduls ** Projekt: Data Engineering**
 von J.W.
+
