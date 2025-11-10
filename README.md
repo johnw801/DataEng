@@ -79,6 +79,7 @@ Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **
 ```bash
 docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
 ```
+Erstellung der Tabellen und Standarduser `admin` sowie `myuser (User mit least privilege Rolle)`
 
 Alternativ können auch die SQL-Dateien manuell ausgeführt werden:
 
@@ -148,6 +149,9 @@ initialespasswortbitteaendern
 ```
 
   → **Bitte unbedingt ändern!**
+
+* Nach dem Ausführen von `init.cql` werden eine `admin` Rolle und eine Userrolle `myuser` (least privilege) für den Zugriff auf die Cassandra DB erstellt.
+* Für den Produktiveinsatz wird dringend empfohlen den Standard Cassandra-Superuser zu löschen oder zu deaktivieren. Dafür wird das Skript `deletesuperuser.cql` bereitgestellt.
 
 * Kafka Log-Retention:
 
