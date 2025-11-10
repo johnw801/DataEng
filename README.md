@@ -79,7 +79,7 @@ Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **
 ```bash
 docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
 ```
-Erstellung der Tabellen und Standarduser `admin` sowie `myuser (User mit least privilege Rolle)`
+Erstellung der Tabellen `sensor_aggregates` und `sensor_anomalies` sowie Standarduser `admin` sowie `myuser` (User mit least privilege Rolle)
 
 Alternativ können auch die SQL-Dateien manuell ausgeführt werden:
 
