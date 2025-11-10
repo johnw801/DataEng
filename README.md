@@ -63,7 +63,7 @@ Vor dem Start sollten folgende Tools installiert werden:
 
 ## Setup & Ausführung
 
-**Wichtige Hinweise zum Startverhalten:**
+### Wichtige Hinweise zum Startverhalten
 
 - Der vollständige Start aller Services kann bis zu **5 Minuten** dauern.
 - Der Sensor-Simulator hat einen Startverzögerungstimer von **2 Minuten**, damit alle abhängigen Services (Kafka, Spark, Cassandra) korrekt initialisiert sind bevor Daten gesendet werden.
