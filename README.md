@@ -82,12 +82,6 @@ docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
 Erstellung der Tabellen `sensor_aggregates` und `sensor_anomalies` sowie der Standarduser `admin` und `myuser` (User mit least privilege Rechten)
 
 
-Alternativ können auch die SQL-Dateien manuell ausgeführt werden:
-
-```bash
-docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.sql
-```
-
 Optional kann der Cassandra Standard-Superuser entfernt werden:
 
 ```bash
