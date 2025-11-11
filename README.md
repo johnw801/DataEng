@@ -13,13 +13,15 @@ Sensor-Simulator sendet fortlaufend JSON-Messwerte (Temperatur, Salzgehalt) von 
 
 Kafka dient als Message-Broker für den Echtzeit-Datenstrom.
 
-Spark Structured Streaming liest kontinuierlich die Daten aus Kafka, führt Berechnungen und Aggregationen durch:
+- Das Kafka-Topic ist in drei Partitionen unterteilt – eine Partition pro Sensor.
+
+Spark Structured Streaming liest kontinuierlich die Daten aus Kafka und führt folgende Berechnungen und Aggregationen durch:
 
 - Berechnung von Durchschnitts-, Minimal- und Maximalwerten pro Sensor in 30-Sekunden-Zeitfenstern.
 
 - Erkennung von Anomalien, wenn Temperaturwerte außerhalb des normalen Bereichs ( <2.5 °C oder >9.5 °C) liegen.
 
-Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien persistent in den Tabellen sensor_aggregates und sensor_anomalies.
+Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien in den Tabellen sensor_aggregates und sensor_anomalies.
 
 ---
 ### Ordnerstruktur
@@ -84,7 +86,10 @@ Alle Container werden gebaut und gestartet.
 ### 2. Cassandra initialisieren
 
 Bei der **erstmaligen Initialisierung:** 
-Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **2 Minuten** dauern. Danach folgenden Befehl ausführen:
+
+- Warten bis der Cassandra-Container vollständig hochgefahren ist, kann bis zu **2 Minuten** dauern. 
+
+- Danach folgenden Befehl ausführen:
 
 ```bash
 docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
@@ -216,7 +221,7 @@ Zugriff anschließend über [http://localhost:8085](http://localhost:8085)
 
 ## Zugangsdaten & Sicherheit
 
-* Standardpasswort für Cassandra:
+Standardpasswort für Cassandra:
 
 ```
 initialespasswortbitteaendern
@@ -227,13 +232,13 @@ initialespasswortbitteaendern
 * Nach dem Ausführen von `init.cql` werden eine `admin` Rolle und eine Userrolle `myuser` (least privilege) für den Zugriff auf die Cassandra DB erstellt.
 * Für den Produktiveinsatz wird dringend empfohlen den Standard Cassandra-Superuser zu löschen oder zu deaktivieren. Dafür wird das Skript `deletesuperuser.cql` bereitgestellt.
 
-* Kafka Log-Retention:
+Kafka Log-Retention:
 
 ```
 24 Stunden (Datenschutz-konform)
 ```
 
-* .env-Datei: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
+**.env-Datei**: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
 Sie enthält sensible Umgebungsvariablen:
 
 ```
@@ -241,8 +246,11 @@ CASSANDRA_USER=<dein_benutzername>
 CASSANDRA_PASSWORD=<dein_passwort>
 ```
 
-* **Alternative Cassandra-Konfiguration:** Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
+**Alternative Cassandra-Konfiguration:** 
+
+Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
   Dies ist **nicht empfohlen** und sollte nur zu Testzwecken verwendet werden.
+  
 ---
 ### Netzwerksicherheit
 
