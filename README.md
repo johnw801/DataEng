@@ -13,6 +13,8 @@ Sensor-Simulator sendet fortlaufend JSON-Messwerte (Temperatur, Salzgehalt) von 
 
 Kafka dient als Message-Broker für den Echtzeit-Datenstrom.
 
+- Das Kafka-Topic ist in drei Partitionen unterteilt – eine Partition pro Sensor.
+
 Spark Structured Streaming liest kontinuierlich die Daten aus Kafka, führt Berechnungen und Aggregationen durch:
 
 - Berechnung von Durchschnitts-, Minimal- und Maximalwerten pro Sensor in 30-Sekunden-Zeitfenstern.
