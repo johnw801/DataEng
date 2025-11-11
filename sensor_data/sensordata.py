@@ -15,7 +15,7 @@ Parameter:
 - Intervall:     1 Sekunde
 
 Abhängigkeit:
-- kafka-python (siehe requirements.txt)
+- kafka-python (requirements.txt)
 
 Beispielausgabe:
 2025-11-10 10:45:12 [INFO] Send: {'sensor_id': 'SENSOR-01', ...}

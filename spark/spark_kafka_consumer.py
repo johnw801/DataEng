@@ -15,7 +15,7 @@ Parameter:
 - Kafka Topic: sensor-data
 - Cassandra Keyspace: sensordata
   Tabellen: sensor_aggregates, sensor_anomalies
-- ENV Variablen: CASSANDRA_USER, CASSANDRA_PASSWORD
+- Env. Variablen: CASSANDRA_USER, CASSANDRA_PASSWORD
 
 Abhängigkeiten:
 - pyspark

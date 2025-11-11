@@ -74,7 +74,7 @@ services:
     networks:
       - data-pipeline
 
-  # SPARK MASTER – Zentrale Steuerung für Spark-Cluster
+  # SPARK MASTER – Zentrale Steuerung Spark-Cluster
   spark-master:
     container_name: spark-master
     image: bde2020/spark-master:3.3.0-hadoop3.3
