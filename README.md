@@ -15,13 +15,13 @@ Kafka dient als Message-Broker für den Echtzeit-Datenstrom.
 
 - Das Kafka-Topic ist in drei Partitionen unterteilt – eine Partition pro Sensor.
 
-Spark Structured Streaming liest kontinuierlich die Daten aus Kafka, führt Berechnungen und Aggregationen durch:
+Spark Structured Streaming liest kontinuierlich die Daten aus Kafka und führt folgende Berechnungen und Aggregationen durch:
 
 - Berechnung von Durchschnitts-, Minimal- und Maximalwerten pro Sensor in 30-Sekunden-Zeitfenstern.
 
 - Erkennung von Anomalien, wenn Temperaturwerte außerhalb des normalen Bereichs ( <2.5 °C oder >9.5 °C) liegen.
 
-Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien persistent in den Tabellen sensor_aggregates und sensor_anomalies.
+Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien in den Tabellen sensor_aggregates und sensor_anomalies.
 
 ---
 ### Ordnerstruktur
