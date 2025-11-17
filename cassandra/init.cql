@@ -1,20 +1,8 @@
--- admin Rolle anlegen.BITTE PW ÄNDERN !!!!!!
-CREATE ROLE IF NOT EXISTS admin
-    WITH PASSWORD = 'initialespasswortbitteaendern'
-    AND LOGIN = true
-    AND SUPERUSER = true;
-
--- User Rolle anlegen (Least Privilege).BITTE PW ÄNDERN !!!!!!
-CREATE ROLE IF NOT EXISTS myuser
-    WITH PASSWORD = 'initialespasswortbitteaendern'
-    AND LOGIN = true;
+-- Keyspace und Tabellen erstellen
 
 -- Keyspace erstellen
 CREATE KEYSPACE IF NOT EXISTS sensordata
 WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
-
-GRANT SELECT ON KEYSPACE sensordata TO myuser;
-GRANT MODIFY ON KEYSPACE sensordata TO myuser;
 
 -- Tabellen erstellen unter keyspace sensordata
 USE sensordata;
@@ -39,3 +27,20 @@ CREATE TABLE IF NOT EXISTS sensor_anomalies (
     timestamp timestamp,
     PRIMARY KEY (sensor_id, timestamp)
 );
+
+-- Rollen erstellen und Rechte vergeben
+
+-- admin Rolle anlegen.BITTE PW ÄNDERN !!!!!!
+CREATE ROLE IF NOT EXISTS admin
+    WITH PASSWORD = 'initialespasswortbitteaendern'
+    AND LOGIN = true
+    AND SUPERUSER = true;
+
+-- User Rolle anlegen (Least Privilege).BITTE PW ÄNDERN !!!!!!
+CREATE ROLE IF NOT EXISTS myuser
+    WITH PASSWORD = 'initialespasswortbitteaendern'
+    AND LOGIN = true;
+
+-- myuser Leserechte vergeben
+GRANT SELECT ON TABLE sensordata.sensor_aggregates TO myuser;
+GRANT SELECT ON TABLE sensordata.sensor_anomalies TO myuser;
