@@ -45,7 +45,11 @@ try:
     producer = KafkaProducer(
         bootstrap_servers=["kafka:9092"],       # Verbindet Producer mit Kafka-Broker
         value_serializer=lambda v: json.dumps(v).encode("utf-8"), # wandelt Python-Daten in JSON um
-        key_serializer=lambda k: k.encode("utf-8") # Partitionierung nach Sensor-ID
+        key_serializer=lambda k: k.encode("utf-8"), # Partitionierung nach Sensor-ID
+        batch_size=32 * 1024,  # 32 KB Batchgröße
+        compression_type="gzip",  # Komprimiert Nachrichten
+        acks="all",  # Datensicherheit (Broker & Replikate müssen bestätigen)
+        retries=5  # 5 Wiederholversuche bei Fehlern
     )
     logging.info("Connected to Kafka broker")
 except NoBrokersAvailable:
