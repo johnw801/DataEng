@@ -23,6 +23,26 @@ Spark Structured Streaming liest kontinuierlich die Daten aus Kafka und führt f
 
 Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien in den Tabellen sensor_aggregates und sensor_anomalies.
 
+### Datenflussübersicht
+```
+Sensor-Simulator
+   ↓
+Kafka Broker (1)
+   └── Topic sensor-data
+        ├── Partition 1 - SENSOR-01
+        ├── Partition 2 - SENSOR-02
+        └── Partition 3 - SENSOR-03
+             ↓
+Spark Cluster
+   ├── Spark Submit Job
+   ├── Spark Master (1)
+   └── Spark Worker (1)
+        ↓
+Cassandra
+   ├── Keyspace sensordata
+   ├── Table sensor_aggregates
+   └── Table sensor_anomalies
+```
 ---
 ### Ordnerstruktur
 
