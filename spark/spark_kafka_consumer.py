@@ -99,8 +99,8 @@ json_df = (
 
 # Eingangsvalidierung: keine 0-Werte oder leere Sensor-IDs zulassen
 validated_df = json_df.filter(
-    (col("temperature") != 0) &
-    (col("salinity") != 0) &
+    (col("temperature") >= 0) &
+    (col("salinity") >= 0) &
     (col("sensor_id").isNotNull()) &
     (col("sensor_id") != "") &
     (col("sensor_id") != "0")
