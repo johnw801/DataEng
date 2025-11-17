@@ -86,10 +86,10 @@ project-root/
 
 Vor dem Start sollten folgende Tools installiert werden:
 
-| Komponente            | Empfehlung            | Hinweis                                                          |
-| --------------------- |-----------------------| ---------------------------------------------------------------- |
-| **Docker Desktop**    | ≥ 4.x/ mind. 5 GB RAM | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
-| **Python 3.9+**       | Optional              | Nur nötig, wenn Code außerhalb von Docker getesten werden soll   |
+| Komponente            | Empfehlung      | Hinweis                                                          |
+| --------------------- |-----------------| ---------------------------------------------------------------- |
+| **Docker Desktop**    | ≥ 4.x/ 6 GB RAM | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
+| **Python 3.9+**       | Optional        | Nur nötig, wenn Code außerhalb von Docker getesten werden soll   |
 
 ---
 
