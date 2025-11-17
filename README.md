@@ -53,12 +53,22 @@ project-root/
 │   ├── Dockerfile             # Image-Build für den Sensor-Simulator
 │   ├── requirements.txt       # Python-Abhängigkeiten
 │   └── sensordata.py          # Sensor-Simulator (Kafka Producer)
+│
 ├── spark/
 │   └── spark_kafka_consumer.py # Spark Streaming Job
+│
 ├── cassandra/
 │   ├── init.cql               # Initialisierung des Keyspace & Tabellen
 │   ├── cassandra.yaml         # Benutzerdefinierte Konfiguration (optional entfernbar)
 │   └── deletesuperuser.cql    # Optional: Entfernt Cassandra Superuser
+│
+├── data_governance/
+│   ├── data_dictionary.md     # Datenstrukturen & Felddefinitionen
+│   ├── roles_permissions.md   # Rollen- & Rechtekonzept
+│   ├── retention_privacy.md   # Aufbewahrung, Datenschutz, Security
+│   ├── validation_rules.md    # Validierungs- & Verarbeitungsregeln
+│   └── versioning.md          # Versionsmanagement
+│        
 ├── docker-compose.yaml        # Service-Konfiguration
 └── .env                       # Muss manuell angelegt werden (Cassandra-Credentials)
 ```
@@ -114,7 +124,7 @@ Bei der **erstmaligen Initialisierung:**
 ```bash
 docker exec -it cassandra cqlsh -u cassandra -p cassandra -f /init.cql
 ```
-Erstellung des keyspaces `sensordata`, der Tabellen `sensor_aggregates` und `sensor_anomalies` sowie der Standarduser `admin` und `myuser` (User mit least privilege Rechten)
+Erstellung des keyspaces `sensordata`, der Tabellen `sensor_aggregates` und `sensor_anomalies` sowie der Standarduser `admin` und `myuser` (User mit least privilege Rechten - Leserechte)
 
 
 Optional kann der Cassandra Standard-Superuser entfernt werden:
@@ -249,7 +259,7 @@ initialespasswortbitteaendern
 
   → **Bitte unbedingt ändern!**
 
-* Nach dem Ausführen von `init.cql` werden eine `admin` Rolle und eine Userrolle `myuser` (least privilege) für den Zugriff auf die Cassandra DB erstellt.
+* Nach dem Ausführen von `init.cql` werden eine `admin` Rolle und eine Userrolle `myuser` (least privilege - Leserechte) für den Zugriff auf die Cassandra DB erstellt.
 * Für den Produktiveinsatz wird dringend empfohlen den Standard Cassandra-Superuser zu löschen oder zu deaktivieren. Dafür wird das Skript `deletesuperuser.cql` bereitgestellt.
 
 Kafka Log-Retention:
@@ -293,6 +303,8 @@ Diese Sicherheitsmechanismen erfordern die Einrichtung geeigneter Zertifikate un
 ## Data Governance
 
 Die Richtlinien zu Datenqualität, Rollen & Berechtigungen sowie Compliance befinden sich im Ordner `data_governance/`.
+
+---
 
 ## Skalierbarkeit
 
