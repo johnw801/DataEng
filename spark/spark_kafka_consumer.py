@@ -97,11 +97,20 @@ json_df = (
     .select("data.*")
 )
 
+# Eingangsvalidierung: keine 0-Werte oder leere Sensor-IDs zulassen
+validated_df = json_df.filter(
+    (col("temperature") != 0) &
+    (col("salinity") != 0) &
+    (col("sensor_id").isNotNull()) &
+    (col("sensor_id") != "") &
+    (col("sensor_id") != "0")
+)
+
 # Fensterbasierte Aggregationen
 # Aggregation in 30-Sekunden-Zeitfenstern pro Sensor
 # Berechnet Durchschnitt, Minimum und Maximum der Temperatur & Salinität
 windowed_df = (
-    json_df
+    validated_df
     .withWatermark("timestamp", "1 minute")  # erlaubt 1 Minute "late data"
     .groupBy(
         col("sensor_id"),
@@ -124,8 +133,13 @@ windowed_df_flat = (
 )
 
 # Anomalie-Erkennung
-# Filtert Sensorwerte, deren Temperatur außerhalb des "normalen" Bereichs lieg
-anomalies_df = json_df.filter((col("temperature") > 9.5) | (col("temperature") < 2.5))
+# Filtert Sensorwerte, deren Temperatur und Salzgehalt außerhalb des "normalen" Bereichs liegt
+anomalies_df = validated_df.filter(
+    (col("temperature") > 9.5) |
+    (col("temperature") < 2.5) |
+    (col("salinity") > 34) |
+    (col("salinity") < 31)
+)
 
  # Cassandra Write-Funktionen
 def write_to_cassandra(batch_df, batch_id):
