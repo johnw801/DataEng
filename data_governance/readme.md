@@ -12,8 +12,6 @@ Dieses Verzeichnis enthält alle Richtlinien, Definitionen und Regeln, die siche
 
 **Data Validation Rules** – Regeln zur Validierung von Eingangsdaten in Spark
 
-**Versioning & Change Management** – Richtlinien für Änderungen an Schemas und Pipelines
-
 ## Ziel
 
 Die Dokumente in diesem Ordner bilden die Grundlage für:
