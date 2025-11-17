@@ -76,10 +76,10 @@ project-root/
 
 Vor dem Start sollten folgende Tools installiert werden:
 
-| Komponente            | Empfehlung                  | Hinweis                                                          |
-| --------------------- | --------------------------- | ---------------------------------------------------------------- |
-| **Docker Desktop**    | ≥ 4.x/ mind. 4 GB RAM       | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
-| **Python 3.9+**       | Optional                    | Nur nötig, wenn Code außerhalb von Docker getesten werden soll   |
+| Komponente            | Empfehlung            | Hinweis                                                          |
+| --------------------- |-----------------------| ---------------------------------------------------------------- |
+| **Docker Desktop**    | ≥ 4.x/ mind. 5 GB RAM | Empfohlen für lokale Entwicklung und Containerverwaltung         |            
+| **Python 3.9+**       | Optional              | Nur nötig, wenn Code außerhalb von Docker getesten werden soll   |
 
 ---
 
@@ -289,6 +289,10 @@ Für Produktivumgebungen wird empfohlen:
 Diese Sicherheitsmechanismen erfordern die Einrichtung geeigneter Zertifikate und Schlüsseldateien (z. B. JKS oder PEM) zur Authentifizierung und Verschlüsselung.
 
 ---
+
+## Data Governance
+
+Die Richtlinien zu Datenqualität, Rollen & Berechtigungen sowie Compliance befinden sich im Ordner `data_governance/`.
 
 ## Skalierbarkeit
 
