@@ -19,7 +19,7 @@ services:
     environment:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     restart: unless-stopped
-    # Kurze Startverzögerung (2min), um sicherzustellen, dass Cassandra und Submit initialisiert ist
+    # Kurze Startverzögerung (2min), um sicherzustellen, dass Cassandra und Submit initialisiert sind
     command: bash -c "sleep 120 && python /app/sensordata.py"
     networks:
       - data-pipeline
@@ -40,7 +40,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
 
-      # Replikation & Aufbewahrung
+      # Replikation, Partitionierung & Aufbewahrung
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # speichert Offsets nur einmal
       KAFKA_NUM_PARTITIONS: 3    # 3 Sensoren = 3 Partionierungen
       KAFKA_LOG_RETENTION_HOURS: 24  # Datenschutz: alte Daten nach 24h löschen
@@ -151,14 +151,14 @@ services:
       #networks:
        # - data-pipeline
 
-# VOLUMES – persistente Speicherbereiche
+# VOLUMES – Persistente Speicherung; verhindert Datenverlust bei Container-Neustarts
 volumes:
   kafka_data:
   spark_data:
   cassandra_data:
   spark_checkpoints:
 
-# NETWORKS – interne Docker-Netzwerke
+# NETWORKS – internes Docker-Netzwerk; Dienste sind isoliert, aber gegenseitig erreichbar
 networks:
   data-pipeline:
     driver: bridge # isoliertes Bridge-Netzwerk
