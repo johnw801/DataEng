@@ -65,7 +65,7 @@ project-root/
 ├── data_governance/
 │   ├── data_dictionary.md     # Datenstrukturen & Felddefinitionen
 │   ├── roles_permissions.md   # Rollen- & Rechtekonzept
-│   ├── retention_privacy.md   # Aufbewahrung, Datenschutz, Security
+│   ├── retention_security.md   # Aufbewahrung, Datenschutz, Security
 │   ├── validation_rules.md    # Validierungs- & Verarbeitungsregeln
 │   └── versioning.md          # Versionsmanagement
 │        
