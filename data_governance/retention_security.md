@@ -1,4 +1,4 @@
-# Retention and Privacy
+# Retention and Security
 Dieser Abschnitt definiert, wie lange Daten gespeichert werden, und beschreibt Datenschutz- sowie Sicherheitsanforderungen .
 
 **Kafka Datenaufbewahrung**
