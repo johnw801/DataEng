@@ -6,7 +6,7 @@ Dieses Verzeichnis enthält alle Richtlinien, Definitionen und Regeln, die siche
 
 **Data Dictionary** – Beschreibung aller Datenfelder in Kafka und Cassandra
 
-**Roles & Permissions** – Zugriffskontrolle und Berechtigungsmodell
+**Roles & Permissions** – Zugriffskontrolle und Berechtigungen
 
 **Retention & Privacy** – Aufbewahrungsfristen, Datenschutz und Sicherheit
 
@@ -16,7 +16,6 @@ Dieses Verzeichnis enthält alle Richtlinien, Definitionen und Regeln, die siche
 
 Die Dokumente in diesem Ordner bilden die Grundlage für:
 
-- reproduzierbare Datenverarbeitung
-- Compliance (z. B. DSGVO)
+- Compliance (z.B. DSGVO)
 - konsistente Datenqualität
-- Auditfähigkeit und technischen Betrieb
+- Auditfähigkeit

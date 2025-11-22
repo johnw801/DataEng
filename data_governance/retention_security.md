@@ -1,5 +1,5 @@
 # Retention and Security
-Dieser Abschnitt definiert, wie lange Daten gespeichert werden, und beschreibt Datenschutz- sowie Sicherheitsanforderungen .
+Dieser Abschnitt definiert, wie lange Daten gespeichert werden und beschreibt Datenschutz- sowie Sicherheitsanforderungen .
 
 **Kafka Datenaufbewahrung**
 - Aufbewahrungsdauer: 24 Stunden
@@ -13,7 +13,6 @@ Dieser Abschnitt definiert, wie lange Daten gespeichert werden, und beschreibt D
 
 **Netzwerksicherheit**
 
-- Keine extern exponierten Ports außer 9042
-- Web-UIs optional aktivierbar
-- Empfehlung für Produktion: TLS/SSL für Daten in Transit zwischen Kafka, Spark und Cassandra, 
+- Keine extern exponierten Ports (mit Ausnahme 9042)
+- Empfehlung für Produktion: TLS/SSL für Daten in Transit zwischen Kafka, Spark und Cassandra aktivieren
 - Zusätzlich TDE/ Verschlüsselung für Daten at Rest

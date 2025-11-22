@@ -15,4 +15,3 @@ Ungültige Datensätze werden verworfen, bevor Aggregationen erfolgen.
 - Anomalien gelten bei:
   - Temperatur < 2.5°C oder > 9.5°C
   - Salzgehalt < 31 PSU oder > 34 PSU
-- Fehlerhafte oder unvollständige Nachrichten werden geloggt und verworfen
