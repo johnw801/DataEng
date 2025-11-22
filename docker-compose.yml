@@ -1,3 +1,15 @@
+# Streaming-Datenpipeline
+# Sensor-Simulator erzeugt Daten, die über Kafka gestreamt und von
+# Spark verarbeitet werden. Ergebnisse werden in Cassandra gespeichert.
+#
+# Services:
+# - sensor-simulator: erzeugt synthetische Messwerte
+# - kafka: Broker für Datenstream
+# - spark-master / spark-worker: verarbeitet die Daten
+# - spark-submit-job: startet den Job
+# - cassandra: speichert Ergebnisse
+# - optional provectuslabs/kafka-ui: Service für Kafka UI
+
 services:
 
   # SENSOR-SIMULATOR – simuliert Echtzeitdaten für Kafka
