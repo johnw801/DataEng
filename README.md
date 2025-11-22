@@ -21,7 +21,7 @@ Spark Structured Streaming liest kontinuierlich die Daten aus Kafka und führt f
 
 - Erkennung von Anomalien.
 
-Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien in den Tabellen sensor_aggregates und sensor_anomalies.
+Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien in den Tabellen `sensor_aggregates` und `sensor_anomalies`.
 
 ### Datenflussübersicht
 ```
