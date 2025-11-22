@@ -280,7 +280,7 @@ CASSANDRA_PASSWORD=<dein_passwort>
 
 - Die Datei `cassandra.yaml` im Ordner `/cassandra` wurde so angepasst, dass Cassandra mit Passwort-Authentifizierung, Rollen- und Berechtigungssystem arbeitet.
 
-- Das Löschen dieser Datei führt dazu, dass eine unsichere Default-Konfiguration ohne Zugangskontrolle genutzt wird.
+- Das Löschen dieser Datei führt dazu, dass eine unsichere Standard-Konfiguration ohne Zugangskontrolle genutzt wird.
 
 - Dies ist nicht empfohlen und sollte nur zu Testzwecken verwendet werden.
   
