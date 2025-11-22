@@ -66,8 +66,7 @@ project-root/
 │   ├── data_dictionary.md     # Datenstrukturen & Felddefinitionen
 │   ├── roles_permissions.md   # Rollen- & Rechtekonzept
 │   ├── retention_security.md   # Aufbewahrung, Datenschutz, Security
-│   ├── validation_rules.md    # Validierungs- & Verarbeitungsregeln
-│   └── versioning.md          # Versionsmanagement
+│   ├── validation_rules.md    # Validierungs- & Verarbeitungsregeln 
 │        
 ├── docker-compose.yaml        # Service-Konfiguration
 └── .env                       # Muss manuell angelegt werden (Cassandra-Credentials)
