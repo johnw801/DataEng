@@ -108,7 +108,7 @@ validated_df = json_df.filter(
 
 # Fensterbasierte Aggregationen
 # Aggregation in 30-Sekunden-Zeitfenstern pro Sensor
-# Berechnet Durchschnitt, Minimum und Maximum der Temperatur & Salinität
+# Berechnet Durchschnitt, Minimum und Maximum der Temperatur & Durchschnittlichen Salzgehalt
 windowed_df = (
     validated_df
     .withWatermark("timestamp", "1 minute")  # erlaubt 1 Minute "late data"
