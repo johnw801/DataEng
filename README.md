@@ -265,7 +265,7 @@ initialespasswortbitteaendern
 Kafka Log-Retention:
 
 ```
-24 Stunden (Datenschutz-konform)
+24 Stunden (Datenschutzkonform)
 ```
 
 **.env-Datei**: Diese wird nicht mitgeliefert und muss manuell angelegt werden.
