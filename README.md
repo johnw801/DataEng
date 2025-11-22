@@ -19,7 +19,7 @@ Spark Structured Streaming liest kontinuierlich die Daten aus Kafka und führt f
 
 - Berechnung von Durchschnitts-, Minimal- und Maximalwerten pro Sensor in 30-Sekunden-Zeitfenstern.
 
-- Erkennung von Anomalien, wenn Temperaturwerte außerhalb des normalen Bereichs ( <2.5 °C oder >9.5 °C) liegen.
+- Erkennung von Anomalien.
 
 Cassandra speichert sowohl aggregierte Sensordaten als auch erkannte Anomalien in den Tabellen sensor_aggregates und sensor_anomalies.
 
@@ -65,7 +65,7 @@ project-root/
 ├── data_governance/
 │   ├── data_dictionary.md     # Datenstrukturen & Felddefinitionen
 │   ├── roles_permissions.md   # Rollen- & Rechtekonzept
-│   ├── retention_security.md   # Aufbewahrung, Datenschutz, Security
+│   ├── retention_security.md   # Aufbewahrung, Datenschutz, Sicherheit
 │   ├── validation_rules.md    # Validierungs- & Verarbeitungsregeln 
 │        
 ├── docker-compose.yaml        # Service-Konfiguration
@@ -259,8 +259,8 @@ initialespasswortbitteaendern
 
   → **Bitte unbedingt ändern!**
 
-* Nach dem Ausführen von `init.cql` werden eine `admin` Rolle und eine Userrolle `myuser` (least privilege - Leserechte) für den Zugriff auf die Cassandra DB erstellt.
-* Für den Produktiveinsatz wird dringend empfohlen den Standard Cassandra-Superuser zu löschen oder zu deaktivieren. Dafür wird das Skript `deletesuperuser.cql` bereitgestellt.
+- Nach dem Ausführen von `init.cql` werden eine `admin` Rolle und eine Userrolle `myuser` (least privilege - Leserechte) für den Zugriff auf die Cassandra DB erstellt.
+- Für den Produktiveinsatz wird dringend empfohlen den Standard Cassandra-Superuser zu löschen oder zu deaktivieren. Dafür wird das Skript `deletesuperuser.cql` bereitgestellt.
 
 Kafka Log-Retention:
 
@@ -278,15 +278,18 @@ CASSANDRA_PASSWORD=<dein_passwort>
 
 **Alternative Cassandra-Konfiguration:** 
 
-Die Datei `cassandra.yaml` im Ordner `/cassandra` kann **gelöscht** werden, um die **Standardkonfiguration** von Cassandra zu aktivieren. Dabei wird u. a. der `AllowAllAuthenticator` genutzt, der **keine Authentifizierungsprüfung** durchführt.
-  Dies ist **nicht empfohlen** und sollte nur zu Testzwecken verwendet werden.
+- Die Datei `cassandra.yaml` im Ordner `/cassandra` wurde so angepasst, dass Cassandra mit Passwort-Authentifizierung, Rollen- und Berechtigungssystem arbeitet.
+
+- Das Löschen dieser Datei führt dazu, dass eine unsichere Default-Konfiguration ohne Zugangskontrolle genutzt wird.
+
+- Dies ist nicht empfohlen und sollte nur zu Testzwecken verwendet werden.
   
 ---
 ### Netzwerksicherheit
 
-* Standardmäßig sind **alle externen Ports deaktiviert** (außer Cassandra-Port `9042` für PyCharm-Integration) um Netzwerkisolation zu wahren.
-* Ports können bei Bedarf in `docker-compose.yml` aktiviert werden.
-* Kafka und Spark Web-UIs sind **optional** (siehe oben).
+- Standardmäßig sind **alle externen Ports deaktiviert** (außer Cassandra-Port `9042` für PyCharm-Integration) um Netzwerkisolation zu wahren. 
+- Ports können bei Bedarf in `docker-compose.yml` aktiviert werden. 
+- Kafka und Spark Web-UIs sind **optional** (siehe oben).
 ---
 ### Datenverschlüsselung
 
